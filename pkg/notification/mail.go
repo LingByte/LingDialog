@@ -8,7 +8,7 @@ import (
 	"html/template"
 	"net/smtp"
 
-	LingEcho "github.com/code-100-precent/LingFramework"
+	LingEcho "github.com/LingByte/LingDialog"
 )
 
 // MailConfig 邮件配置

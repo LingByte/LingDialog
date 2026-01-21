@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/code-100-precent/LingFramework/pkg/constants"
+	"github.com/LingByte/LingDialog/pkg/constants"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"

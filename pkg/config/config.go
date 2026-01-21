@@ -4,9 +4,9 @@ import (
 	"log"
 	"os"
 
+	"github.com/LingByte/LingDialog/pkg/logger"
+	"github.com/LingByte/LingDialog/pkg/utils"
 	"github.com/LingByte/lingstorage-sdk-go"
-	"github.com/code-100-precent/LingFramework/pkg/logger"
-	"github.com/code-100-precent/LingFramework/pkg/utils"
 )
 
 // Config represents the system configuration

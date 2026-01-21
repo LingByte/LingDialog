@@ -9,9 +9,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/code-100-precent/LingFramework/pkg/constants"
-	"github.com/code-100-precent/LingFramework/pkg/logger"
-	"github.com/code-100-precent/LingFramework/pkg/utils"
+	"github.com/LingByte/LingDialog/pkg/constants"
+	"github.com/LingByte/LingDialog/pkg/logger"
+	"github.com/LingByte/LingDialog/pkg/utils"
 	"github.com/google/uuid"
 	"github.com/sashabaranov/go-openai"
 	"go.uber.org/zap"

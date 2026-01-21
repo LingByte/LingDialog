@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/code-100-precent/LingFramework/pkg/logger"
+	"github.com/LingByte/LingDialog/pkg/logger"
 	"go.uber.org/zap"
 )
 

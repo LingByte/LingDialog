@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/code-100-precent/LingFramework/pkg/constants"
-	"github.com/code-100-precent/LingFramework/pkg/utils"
+	"github.com/LingByte/LingDialog/pkg/constants"
+	"github.com/LingByte/LingDialog/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/mssola/user_agent"
 	"gorm.io/gorm"

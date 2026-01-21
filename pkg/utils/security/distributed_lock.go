@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/code-100-precent/LingFramework/pkg/cache"
+	"github.com/LingByte/LingDialog/pkg/cache"
 )
 
 // DistributedLock 分布式锁接口

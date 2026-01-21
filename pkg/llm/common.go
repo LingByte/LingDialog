@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/code-100-precent/LingFramework/pkg/logger"
+	"github.com/LingByte/LingDialog/pkg/logger"
 	"github.com/google/uuid"
 	"github.com/sashabaranov/go-openai"
 	"go.uber.org/zap"

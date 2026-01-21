@@ -3,7 +3,7 @@ package utils
 import (
 	"testing"
 
-	"github.com/code-100-precent/LingFramework/pkg/constants"
+	"github.com/LingByte/LingDialog/pkg/constants"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/code-100-precent/LingFramework/pkg/utils"
+	"github.com/LingByte/LingDialog/pkg/utils"
 )
 
 // LoadConfigFromEnv loads WebSocket configuration from environment variables

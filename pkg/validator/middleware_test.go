@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/code-100-precent/LingFramework/pkg/i18n"
+	"github.com/LingByte/LingDialog/pkg/i18n"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 )

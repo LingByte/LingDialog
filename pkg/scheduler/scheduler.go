@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/code-100-precent/LingFramework/pkg/logger"
+	"github.com/LingByte/LingDialog/pkg/logger"
 	"github.com/robfig/cron/v3"
 	"go.uber.org/zap"
 )

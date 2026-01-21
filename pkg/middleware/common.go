@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"github.com/code-100-precent/LingFramework/pkg/constants"
-	"github.com/code-100-precent/LingFramework/pkg/utils"
+	"github.com/LingByte/LingDialog/pkg/constants"
+	"github.com/LingByte/LingDialog/pkg/utils"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-contrib/sessions/memstore"

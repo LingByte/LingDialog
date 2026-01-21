@@ -3,7 +3,7 @@ package handlers
 import (
 	"testing"
 
-	"github.com/code-100-precent/LingFramework/pkg/config"
+	"github.com/LingByte/LingDialog/pkg/config"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"

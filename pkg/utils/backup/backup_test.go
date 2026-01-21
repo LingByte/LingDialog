@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/code-100-precent/LingFramework/pkg/config"
+	"github.com/LingByte/LingDialog/pkg/config"
 )
 
 func TestBackupSQLiteDatabase(t *testing.T) {

@@ -1,7 +1,7 @@
 package encoder
 
 import (
-	"github.com/code-100-precent/LingFramework/pkg/media"
+	"github.com/LingByte/LingDialog/pkg/media"
 )
 
 func createPCMADecode(src, pcm media.CodecConfig) media.EncoderFunc {

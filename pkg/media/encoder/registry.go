@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/code-100-precent/LingFramework/pkg/media"
+	"github.com/LingByte/LingDialog/pkg/media"
 )
 
 const (

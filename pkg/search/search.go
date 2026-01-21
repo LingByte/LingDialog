@@ -3,10 +3,10 @@ package search
 import (
 	"fmt"
 
-	"github.com/code-100-precent/LingFramework/internal/models"
-	"github.com/code-100-precent/LingFramework/pkg/constants"
-	"github.com/code-100-precent/LingFramework/pkg/utils"
-	"github.com/code-100-precent/LingFramework/pkg/utils/response"
+	"github.com/LingByte/LingDialog/internal/models"
+	"github.com/LingByte/LingDialog/pkg/constants"
+	"github.com/LingByte/LingDialog/pkg/utils"
+	"github.com/LingByte/LingDialog/pkg/utils/response"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )

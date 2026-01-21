@@ -1,7 +1,7 @@
 package transaction
 
 import (
-	"github.com/code-100-precent/LingFramework/pkg/constants"
+	"github.com/LingByte/LingDialog/pkg/constants"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )

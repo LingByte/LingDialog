@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/code-100-precent/LingFramework/pkg/logger"
+	"github.com/LingByte/LingDialog/pkg/logger"
 	"github.com/sashabaranov/go-openai"
 	"go.uber.org/zap"
 )

@@ -3,12 +3,12 @@ package handlers
 import (
 	"net/http"
 
-	LingEcho "github.com/code-100-precent/LingFramework"
-	"github.com/code-100-precent/LingFramework/internal/models"
-	"github.com/code-100-precent/LingFramework/pkg/config"
-	"github.com/code-100-precent/LingFramework/pkg/constants"
-	"github.com/code-100-precent/LingFramework/pkg/search"
-	"github.com/code-100-precent/LingFramework/pkg/utils"
+	LingEcho "github.com/LingByte/LingDialog"
+	"github.com/LingByte/LingDialog/internal/models"
+	"github.com/LingByte/LingDialog/pkg/config"
+	"github.com/LingByte/LingDialog/pkg/constants"
+	"github.com/LingByte/LingDialog/pkg/search"
+	"github.com/LingByte/LingDialog/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )

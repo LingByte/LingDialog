@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"github.com/code-100-precent/LingFramework/pkg/config"
-	"github.com/code-100-precent/LingFramework/pkg/llm"
-	"github.com/code-100-precent/LingFramework/pkg/logger"
+	"github.com/LingByte/LingDialog/pkg/config"
+	"github.com/LingByte/LingDialog/pkg/llm"
+	"github.com/LingByte/LingDialog/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )

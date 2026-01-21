@@ -1,4 +1,4 @@
-module github.com/code-100-precent/LingFramework
+module github.com/LingByte/LingDialog
 
 go 1.25.1
 
@@ -126,3 +126,21 @@ require (
 	modernc.org/memory v1.5.0 // indirect
 	modernc.org/sqlite v1.23.1 // indirect
 )
+
+replace github.com/LingByte/LingDialog/pkg/cache => ./pkg/cache
+
+replace github.com/LingByte/LingDialog/pkg/i18n => ./pkg/i18n
+
+replace github.com/LingByte/LingDialog/pkg/scheduler => ./pkg/scheduler
+
+replace github.com/LingByte/LingDialog/pkg/validator => ./pkg/validator
+
+replace github.com/LingByte/LingDialog/pkg/search => ./pkg/search
+
+replace github.com/LingByte/LingDialog/pkg/websocket => ./pkg/websocket
+
+replace github.com/LingByte/LingDialog/pkg/config => ./pkg/config
+
+replace github.com/LingByte/LingDialog/pkg/middleware => ./pkg/middleware
+
+replace github.com/LingByte/LingDialog/pkg/llm => ./pkg/llm

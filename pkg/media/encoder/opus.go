@@ -6,7 +6,7 @@ package encoder
 import (
 	"fmt"
 
-	"github.com/code-100-precent/LingFramework/pkg/media"
+	"github.com/LingByte/LingDialog/pkg/media"
 	"github.com/hraban/opus"
 )
 

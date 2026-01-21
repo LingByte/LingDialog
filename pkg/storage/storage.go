@@ -4,8 +4,8 @@ import (
 	"io"
 	"time"
 
+	"github.com/LingByte/LingDialog/pkg/config"
 	"github.com/LingByte/lingstorage-sdk-go"
-	"github.com/code-100-precent/LingFramework/pkg/config"
 )
 
 // GetClient 获取全局存储客户端

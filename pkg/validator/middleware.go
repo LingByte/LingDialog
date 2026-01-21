@@ -1,8 +1,8 @@
 package validator
 
 import (
-	"github.com/code-100-precent/LingFramework/pkg/i18n"
-	"github.com/code-100-precent/LingFramework/pkg/utils/response"
+	"github.com/LingByte/LingDialog/pkg/i18n"
+	"github.com/LingByte/LingDialog/pkg/utils/response"
 	"github.com/gin-gonic/gin"
 )
 

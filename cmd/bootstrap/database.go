@@ -7,12 +7,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/code-100-precent/LingFramework/internal/models"
-	"github.com/code-100-precent/LingFramework/pkg/config"
-	"github.com/code-100-precent/LingFramework/pkg/logger"
-	"github.com/code-100-precent/LingFramework/pkg/middleware"
-	"github.com/code-100-precent/LingFramework/pkg/notification"
-	"github.com/code-100-precent/LingFramework/pkg/utils"
+	"github.com/LingByte/LingDialog/internal/models"
+	"github.com/LingByte/LingDialog/pkg/config"
+	"github.com/LingByte/LingDialog/pkg/logger"
+	"github.com/LingByte/LingDialog/pkg/middleware"
+	"github.com/LingByte/LingDialog/pkg/notification"
+	"github.com/LingByte/LingDialog/pkg/utils"
 	"go.uber.org/zap"
 
 	"gorm.io/gorm"

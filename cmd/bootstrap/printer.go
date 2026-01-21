@@ -5,8 +5,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/code-100-precent/LingFramework/pkg/config"
-	"github.com/code-100-precent/LingFramework/pkg/logger"
+	"github.com/LingByte/LingDialog/pkg/config"
+	"github.com/LingByte/LingDialog/pkg/logger"
 	"go.uber.org/zap"
 )
 

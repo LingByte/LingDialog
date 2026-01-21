@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/code-100-precent/LingFramework/internal/models"
-	"github.com/code-100-precent/LingFramework/pkg/constants"
-	"github.com/code-100-precent/LingFramework/pkg/logger"
+	"github.com/LingByte/LingDialog/internal/models"
+	"github.com/LingByte/LingDialog/pkg/constants"
+	"github.com/LingByte/LingDialog/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )

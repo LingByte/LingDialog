@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/code-100-precent/LingFramework/pkg/cache"
+	"github.com/LingByte/LingDialog/pkg/cache"
 )
 
 func TestNewMemoryLock(t *testing.T) {

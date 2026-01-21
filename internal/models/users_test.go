@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/code-100-precent/LingFramework/pkg/constants"
+	"github.com/LingByte/LingDialog/pkg/constants"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/sqlite"

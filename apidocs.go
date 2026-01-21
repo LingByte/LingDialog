@@ -7,8 +7,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/code-100-precent/LingFramework/pkg/constants"
-	docsPkg "github.com/code-100-precent/LingFramework/pkg/docs"
+	"github.com/LingByte/LingDialog/pkg/constants"
+	docsPkg "github.com/LingByte/LingDialog/pkg/docs"
 	"gorm.io/gorm"
 
 	"github.com/gin-gonic/gin"

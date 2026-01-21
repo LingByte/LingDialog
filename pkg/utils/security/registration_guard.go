@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/code-100-precent/LingFramework/pkg/cache"
+	"github.com/LingByte/LingDialog/pkg/cache"
 	"go.uber.org/zap"
 )
 

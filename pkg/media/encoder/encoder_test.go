@@ -3,7 +3,7 @@ package encoder
 import (
 	"testing"
 
-	"github.com/code-100-precent/LingFramework/pkg/media"
+	"github.com/LingByte/LingDialog/pkg/media"
 	"github.com/stretchr/testify/assert"
 )
 
