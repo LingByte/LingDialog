@@ -181,17 +181,13 @@ func (h *Handlers) Register(engine *gin.Engine) {
 func (h *Handlers) registerAuthRoutes(r *gin.RouterGroup) {
 	auth := r.Group("/auth")
 	{
-		// 登录相关 - 不需要认证
+		// login by password
 		auth.POST("/login/password", h.handleUserSigninByPassword)
-		auth.POST("/login/email", h.handleUserSigninByEmail)
+
 		auth.GET("/logout", h.handleUserLogout)
-		auth.POST("/logout", h.handleUserLogout)
 
 		// 注册相关 - 不需要认证
 		auth.POST("/register", h.handleUserRegister)
-
-		// 邮箱验证码 - 不需要认证
-		auth.POST("/email/code", h.handleSendEmailCode)
 
 		// 密码重置 - 不需要认证
 		auth.POST("/reset-password", h.handleResetPassword)

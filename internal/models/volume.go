@@ -1,5 +1,7 @@
 package models
 
+import "github.com/LingByte/LingDialog/pkg/constants"
+
 // Volume 卷模型
 type Volume struct {
 	BaseModel
@@ -9,5 +11,5 @@ type Volume struct {
 }
 
 func (Volume) TableName() string {
-	return "volumes"
+	return constants.TABLE_VOLUME
 }

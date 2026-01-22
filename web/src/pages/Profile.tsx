@@ -11,10 +11,6 @@ import {
   Phone, 
   MapPin, 
   Settings,
-  Mail,
-  Globe,
-  Clock,
-  Languages
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -90,11 +86,6 @@ const Profile: React.FC = () => {
     }
   }
 
-  const getProfileCompleteness = () => {
-    if (!user) return 0
-    return user.profileComplete || 0
-  }
-
   const tabs = [
     { key: 'basic', label: '基本信息', icon: <User className="w-4 h-4" /> },
     { key: 'contact', label: '联系方式', icon: <Phone className="w-4 h-4" /> },
@@ -120,24 +111,6 @@ const Profile: React.FC = () => {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">个人资料</h1>
             <p className="text-gray-600">管理您的个人信息和偏好设置</p>
           </div>
-
-          {/* 资料完整度 */}
-          <Card className="p-6 mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">资料完整度</h2>
-              <span className="text-2xl font-bold text-blue-600">{getProfileCompleteness()}%</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-3">
-              <div
-                className="bg-gradient-to-r from-blue-500 to-green-500 h-3 rounded-full transition-all duration-300"
-                style={{ width: `${getProfileCompleteness()}%` }}
-              />
-            </div>
-            <p className="text-sm text-gray-600 mt-2">
-              完善您的资料可以获得更好的使用体验
-            </p>
-          </Card>
-
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* 侧边栏 */}
             <div className="lg:col-span-1">

@@ -149,5 +149,8 @@ func RunMigrations(db *gorm.DB) error {
 		&models.StoryNode{},
 		&models.NodeConnection{},
 		&models.NovelSetting{},
+		&models.ChatSession{},
+		&models.ChatMessage{},
+		&models.ChatUsage{},
 	})
 }

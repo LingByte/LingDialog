@@ -4,6 +4,7 @@ import (
 	"github.com/LingByte/LingDialog/pkg/config"
 	"github.com/LingByte/LingDialog/pkg/llm"
 	"github.com/LingByte/LingDialog/pkg/logger"
+	"github.com/LingByte/LingDialog/pkg/middleware"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -65,12 +66,17 @@ func RegisterAIRoutes(r *gin.RouterGroup, db *gorm.DB) {
 	handler := NewAIHandler(db)
 
 	ai := r.Group("/ai")
+	ai.Use(middleware.RequireAuth()) // 添加认证中间件
 	{
-		// 通用聊天接口
+		// common chat
 		chat := ai.Group("/chat")
 		{
 			chat.POST("", handler.Chat)
 			chat.POST("/clear", handler.ClearHistory)
+			chat.GET("/sessions", handler.GetSessions)
+			chat.GET("/sessions/:sessionId/messages", handler.GetSessionMessages)
+			chat.DELETE("/sessions/:sessionId", handler.DeleteSession)
+			chat.GET("/usage", handler.GetUsageStats)
 		}
 
 		// 小说设定生成

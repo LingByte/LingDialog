@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/LingByte/LingDialog/pkg/constants"
 	"gorm.io/gorm"
 )
 
@@ -19,7 +20,6 @@ type Storyline struct {
 	Color       string    `json:"color" gorm:"size:7;default:#3B82F6"`
 	CreatedAt   time.Time `json:"createdAt" gorm:"autoCreateTime"`
 	UpdatedAt   time.Time `json:"updatedAt" gorm:"autoUpdateTime"`
-
 	// 关联数据
 	Nodes []StoryNode `json:"nodes,omitempty" gorm:"foreignKey:StorylineID"`
 }
@@ -74,15 +74,15 @@ type NodeConnection struct {
 
 // TableName 指定表名
 func (Storyline) TableName() string {
-	return "storylines"
+	return constants.TABLE_STORYLINE
 }
 
 func (StoryNode) TableName() string {
-	return "story_nodes"
+	return constants.TABLE_STORY_NODE
 }
 
 func (NodeConnection) TableName() string {
-	return "node_connections"
+	return constants.TABLE_NODE_CONNECTION
 }
 
 // BeforeSave 保存前处理

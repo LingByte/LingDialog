@@ -87,7 +87,7 @@ type User struct {
 
 // TableName 指定 User 模型的表名
 func (User) TableName() string {
-	return "users"
+	return constants.TABLE_USER
 }
 
 func CurrentUser(c *gin.Context) *User {

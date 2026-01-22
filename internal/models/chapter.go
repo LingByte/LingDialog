@@ -1,5 +1,7 @@
 package models
 
+import "github.com/LingByte/LingDialog/pkg/constants"
+
 // Chapter 章节模型
 type Chapter struct {
 	BaseModel
@@ -17,5 +19,5 @@ type Chapter struct {
 }
 
 func (Chapter) TableName() string {
-	return "chapters"
+	return constants.TABLE_CHAPTER
 }

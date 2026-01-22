@@ -1,5 +1,7 @@
 package models
 
+import "github.com/LingByte/LingDialog/pkg/constants"
+
 type PlotPoint struct {
 	BaseModel
 	NovelID uint   `json:"novelId" gorm:"index;comment:小说ID"`
@@ -8,5 +10,5 @@ type PlotPoint struct {
 }
 
 func (PlotPoint) TableName() string {
-	return "plot_points"
+	return constants.TABLE_PLOT_POINT
 }

@@ -22,7 +22,8 @@ function App() {
     useEffect(() => {
         // 应用启动时初始化认证状态
         initializeAuth();
-    }, [initializeAuth]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // 空依赖数组，只在应用启动时执行一次
 
     // 如果正在初始化认证状态，显示加载页面
     if (isLoading) {

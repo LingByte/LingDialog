@@ -1,5 +1,7 @@
 package models
 
+import "github.com/LingByte/LingDialog/pkg/constants"
+
 // Character 角色模型
 type Character struct {
 	BaseModel
@@ -9,5 +11,5 @@ type Character struct {
 }
 
 func (Character) TableName() string {
-	return "characters"
+	return constants.TABLE_CHARACTER
 }

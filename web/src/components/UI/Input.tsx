@@ -12,7 +12,7 @@ import { Eye, EyeOff, X, Loader2 } from 'lucide-react'
 import { clsx } from 'clsx'
 
 
-type Size = 'sm' | 'md' | 'lg'
+type Size = 'sm' | 'md' | 'lg' | 'xl'
 
 // 以 HTMLMotionProps<'input'> 作为基础，移除我们要自定义的 size
 type BaseMotionInputProps = Omit<HTMLMotionProps<'input'>, 'size'>
@@ -34,14 +34,39 @@ interface InputProps extends BaseMotionInputProps {
     changeDebounceMs?: number
     wrapperClassName?: string
     inputClassName?: string
+    variant?: 'default' | 'filled' | 'glass' | 'minimal'
     // 关键：覆盖 onChange 的类型，供内部解构与调用
     onChange?: React.ChangeEventHandler<HTMLInputElement>
 }
 
-const sizeMap: Record<Size, { px: string; py: string; text: string; icon: string }> = {
-    sm: { px: 'px-3',   py: 'py-1.5', text: 'text-sm',  icon: 'w-4 h-4' },
-    md: { px: 'px-3.5', py: 'py-2.5', text: 'text-base',icon: 'w-4 h-4' },
-    lg: { px: 'px-4',   py: 'py-3',   text: 'text-lg',  icon: 'w-5 h-5' },
+const sizeMap: Record<Size, { px: string; py: string; text: string; icon: string; height: string }> = {
+    sm: { px: 'px-3',   py: 'py-2',   text: 'text-sm',  icon: 'w-4 h-4', height: 'h-10' },
+    md: { px: 'px-4',   py: 'py-3',   text: 'text-base',icon: 'w-5 h-5', height: 'h-12' },
+    lg: { px: 'px-5',   py: 'py-4',   text: 'text-lg',  icon: 'w-5 h-5', height: 'h-14' },
+    xl: { px: 'px-6',   py: 'py-5',   text: 'text-xl',  icon: 'w-6 h-6', height: 'h-16' },
+}
+
+const variantStyles = {
+    default: {
+        base: 'bg-white border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20',
+        disabled: 'bg-gray-50 border-gray-200',
+        error: 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
+    },
+    filled: {
+        base: 'bg-gray-50 border border-transparent focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20',
+        disabled: 'bg-gray-100 border-transparent',
+        error: 'bg-red-50 border-red-500 focus:bg-white focus:border-red-500 focus:ring-red-500/20'
+    },
+    glass: {
+        base: 'bg-white/10 border border-white/20 backdrop-blur-sm focus:bg-white/20 focus:border-white/40 focus:ring-2 focus:ring-white/20 text-white placeholder-white/60',
+        disabled: 'bg-white/5 border-white/10 text-white/50',
+        error: 'bg-red-500/10 border-red-400/50 focus:border-red-400 focus:ring-red-400/20'
+    },
+    minimal: {
+        base: 'bg-transparent border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-500 focus:ring-0 px-0',
+        disabled: 'border-gray-200 text-gray-400',
+        error: 'border-red-500 focus:border-red-500'
+    }
 }
 
 // 简易节流
@@ -73,6 +98,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         onChange,
         onValueChange,
         size = 'md',
+        variant = 'default',
         loading = false,
         showCount = false,
         countMax,
@@ -94,6 +120,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     const currentValue = String(isControlled ? value ?? '' : inner)
 
     const [showPassword, setShowPassword] = useState(false)
+    const [isFocused, setIsFocused] = useState(false)
 
     const inputRef = useRef<HTMLInputElement>(null)
     useImperativeHandle(ref, () => inputRef.current as HTMLInputElement)
@@ -108,6 +135,16 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         const val = e.target.value
         if (!isControlled) setInner(val)
         emitChange(val, e)
+    }
+
+    const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+        setIsFocused(true)
+        restProps.onFocus?.(e)
+    }
+
+    const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+        setIsFocused(false)
+        restProps.onBlur?.(e)
     }
 
     const handleClear = () => {
@@ -129,6 +166,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     const hasRightAction = loading || clearable || type === 'password' || rightIcon
 
     const sizeTokens = sizeMap[size]
+    const variantClasses = variantStyles[variant]
 
     const countCurrent = useMemo(() => currentValue.length, [currentValue])
     const countLimit = countMax ?? maxLength
@@ -142,6 +180,13 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
             .filter(Boolean)
             .join(' ') || undefined
 
+    // 获取输入框样式
+    const getInputStyles = () => {
+        if (error) return variantClasses.error
+        if (disabled) return variantClasses.disabled
+        return variantClasses.base
+    }
+
     useEffect(() => {
         return () => {}
     }, [])
@@ -153,16 +198,27 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
                     htmlFor={inputId}
                     initial={{ opacity: 0, y: -6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mb-1.5 block text-sm font-medium text-foreground"
+                    className={clsx(
+                        'mb-2 block text-sm font-medium transition-colors duration-200',
+                        variant === 'glass' ? 'text-white/90' : 'text-gray-700',
+                        isFocused && !error && (variant === 'glass' ? 'text-white' : 'text-blue-600'),
+                        error && 'text-red-600'
+                    )}
                 >
                     {label}
-                    {restProps.required && <span className="ml-0.5 text-destructive">*</span>}
+                    {restProps.required && <span className="ml-1 text-red-500">*</span>}
                 </motion.label>
             )}
 
-            <div className="relative">
+            <div className="relative group">
                 {leftIcon && (
-                    <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    <div className={clsx(
+                        'pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 flex items-center justify-center transition-colors duration-200',
+                        sizeTokens.px,
+                        variant === 'glass' ? 'text-white/50' : 'text-gray-400',
+                        isFocused && !error && (variant === 'glass' ? 'text-white/80' : 'text-blue-500'),
+                        error && 'text-red-500'
+                    )}>
                         {leftIcon}
                     </div>
                 )}
@@ -173,31 +229,48 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
                     type={inputType}
                     value={currentValue}
                     onChange={handleChange}
+                    onFocus={handleFocus}
+                    onBlur={handleBlur}
                     disabled={disabled || loading}
                     readOnly={readOnly}
                     aria-invalid={!!error || undefined}
                     aria-describedby={describedBy}
                     className={clsx(
-                        'input', // 若项目里已有 .input 基类，保留；否则可以仅用以下兜底样式
-                        'w-full rounded-md border bg-background text-foreground placeholder:text-muted-foreground',
-                        'border-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                        sizeTokens.px,
-                        sizeTokens.py,
+                        'w-full rounded-xl transition-all duration-300 outline-none',
+                        sizeTokens.height,
                         sizeTokens.text,
-                        leftIcon && 'pl-10',
-                        hasRightAction && 'pr-10',
-                        disabled && 'opacity-60 cursor-not-allowed',
-                        readOnly && 'opacity-90',
-                        error && 'border-destructive focus-visible:ring-destructive',
+                        leftIcon ? 'pl-12' : sizeTokens.px,
+                        hasRightAction ? 'pr-12' : sizeTokens.px,
+                        variant !== 'minimal' && sizeTokens.py,
+                        getInputStyles(),
+                        disabled && 'cursor-not-allowed opacity-60',
+                        readOnly && 'cursor-default',
+                        'group-hover:shadow-sm',
+                        isFocused && 'shadow-lg',
                         inputClassName,
                         className
                     )}
+                    initial={{ scale: 0.98 }}
+                    animate={{ scale: 1 }}
+                    whileFocus={{ scale: 1.01 }}
+                    transition={{ duration: 0.2 }}
                     // 把剩余属性（已是 HTMLMotionProps<'input'>）传下去，避免 MotionProps 冲突
                     {...(restProps as HTMLMotionProps<'input'>)}
                 />
 
-                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                    {loading && <Loader2 className={clsx('animate-spin text-neutral-400', sizeTokens.icon)} />}
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                    {loading && (
+                        <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                        >
+                            <Loader2 className={clsx(
+                                'animate-spin',
+                                sizeTokens.icon,
+                                variant === 'glass' ? 'text-white/60' : 'text-gray-400'
+                            )} />
+                        </motion.div>
+                    )}
 
                     {clearable && hasValue && !readOnly && !disabled && (
                         <motion.button
@@ -205,10 +278,15 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
                             aria-label="清空输入"
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            whileHover={{ scale: 1.08 }}
-                            whileTap={{ scale: 0.95 }}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
                             onClick={handleClear}
-                            className="p-1 text-neutral-400 hover:text-neutral-600 transition-colors"
+                            className={clsx(
+                                'p-1 rounded-full transition-colors duration-200',
+                                variant === 'glass' 
+                                    ? 'text-white/50 hover:text-white/80 hover:bg-white/10' 
+                                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                            )}
                         >
                             <X className="w-4 h-4" />
                         </motion.button>
@@ -220,30 +298,42 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
                             aria-label={showPassword ? '隐藏密码' : '显示密码'}
                             aria-pressed={showPassword}
                             title={showPassword ? '隐藏密码' : '显示密码'}
-                            whileHover={{ scale: 1.08 }}
-                            whileTap={{ scale: 0.95 }}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
                             onClick={() => setShowPassword(v => !v)}
-                            className="p-1 text-neutral-400 hover:text-neutral-600 transition-colors"
+                            className={clsx(
+                                'p-1 rounded-full transition-colors duration-200',
+                                variant === 'glass' 
+                                    ? 'text-white/50 hover:text-white/80 hover:bg-white/10' 
+                                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                            )}
                         >
                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </motion.button>
                     )}
 
                     {!loading && type !== 'password' && !clearable && rightIcon && (
-                        <span className="text-neutral-400">{rightIcon}</span>
+                        <span className={clsx(
+                            'transition-colors duration-200',
+                            variant === 'glass' ? 'text-white/50' : 'text-gray-400',
+                            isFocused && !error && (variant === 'glass' ? 'text-white/80' : 'text-blue-500')
+                        )}>
+                            {rightIcon}
+                        </span>
                     )}
                 </div>
             </div>
 
-            <div className="mt-1.5 flex items-start justify-between gap-3">
-                <div className="min-w-0">
+            <div className="mt-2 flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
                     {error ? (
                         <motion.p
                             id={errorId}
                             initial={{ opacity: 0, y: -4 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="text-sm text-destructive"
+                            className="text-sm text-red-600 flex items-center gap-1"
                         >
+                            <span className="w-1 h-1 bg-red-600 rounded-full"></span>
                             {error}
                         </motion.p>
                     ) : helperText ? (
@@ -251,7 +341,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
                             id={helpId}
                             initial={{ opacity: 0, y: -4 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="text-sm text-muted-foreground"
+                            className={clsx(
+                                'text-sm',
+                                variant === 'glass' ? 'text-white/60' : 'text-gray-500'
+                            )}
                         >
                             {helperText}
                         </motion.p>
@@ -261,10 +354,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
                 {showCount && (type === 'text' || type === 'search' || type === 'password') && (
                     <div
                         className={clsx(
-                            'text-xs tabular-nums',
+                            'text-xs tabular-nums font-medium',
                             countLimit && countCurrent > (countLimit || 0)
-                                ? 'text-destructive'
-                                : 'text-muted-foreground'
+                                ? 'text-red-500'
+                                : variant === 'glass' 
+                                    ? 'text-white/60' 
+                                    : 'text-gray-400'
                         )}
                         title="字符统计"
                     >

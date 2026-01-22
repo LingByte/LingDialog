@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/LingByte/LingDialog/pkg/constants"
+)
 
 // NovelSetting 小说设定模型
 type NovelSetting struct {
@@ -18,7 +22,7 @@ type NovelSetting struct {
 
 // TableName 指定表名
 func (NovelSetting) TableName() string {
-	return "novel_settings"
+	return constants.TABLE_NOVEL_SETTING
 }
 
 // SettingCategory 设定分类常量

@@ -1,6 +1,9 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"github.com/LingByte/LingDialog/pkg/constants"
+	"gorm.io/gorm"
+)
 
 // Novel 小说模型
 type Novel struct {
@@ -18,7 +21,7 @@ type Novel struct {
 }
 
 func (Novel) TableName() string {
-	return "novels"
+	return constants.TABLE_NOVEL
 }
 
 // AfterCreate 钩子：创建小说后自动创建主故事线

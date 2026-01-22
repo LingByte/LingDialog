@@ -50,6 +50,11 @@ func (g *CharacterGenerator) Chat(messages []Message, temperature float32, maxTo
 	return resp.Choices[0].Message.Content, nil
 }
 
+// GetModel 获取当前使用的模型名称
+func (g *CharacterGenerator) GetModel() string {
+	return g.model
+}
+
 // ChatStream 通用聊天方法（流式）
 func (g *CharacterGenerator) ChatStream(messages []Message, temperature float32, maxTokens int, callback func(segment string, isComplete bool) error) (string, error) {
 	startTime := time.Now()

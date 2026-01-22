@@ -6,6 +6,7 @@ import (
 
 	"github.com/LingByte/LingDialog/internal/models"
 	"github.com/LingByte/LingDialog/pkg/logger"
+	"github.com/LingByte/LingDialog/pkg/middleware"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -245,9 +246,13 @@ func (h *SettingHandler) DeleteSetting(c *gin.Context) {
 func RegisterSettingRoutes(r *gin.RouterGroup, db *gorm.DB) {
 	handler := NewSettingHandler(db)
 
-	r.GET("/settings/:novelId", handler.GetSettings)
-	r.GET("/settings/:novelId/by-category", handler.GetSettingsByCategory)
-	r.POST("/settings", handler.CreateSetting)
-	r.PUT("/settings/:id", handler.UpdateSetting)
-	r.DELETE("/settings/:id", handler.DeleteSetting)
+	settings := r.Group("/settings")
+	settings.Use(middleware.RequireAuth()) // 添加认证中间件
+	{
+		settings.GET("/:novelId", handler.GetSettings)
+		settings.GET("/:novelId/by-category", handler.GetSettingsByCategory)
+		settings.POST("", handler.CreateSetting)
+		settings.PUT("/:id", handler.UpdateSetting)
+		settings.DELETE("/:id", handler.DeleteSetting)
+	}
 }

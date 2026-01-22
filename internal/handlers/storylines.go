@@ -8,6 +8,7 @@ import (
 	"github.com/LingByte/LingDialog/pkg/config"
 	"github.com/LingByte/LingDialog/pkg/llm"
 	"github.com/LingByte/LingDialog/pkg/logger"
+	"github.com/LingByte/LingDialog/pkg/middleware"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -586,20 +587,29 @@ func (h *StorylineHandler) DeleteNodeConnection(c *gin.Context) {
 func RegisterStorylineRoutes(r *gin.RouterGroup, db *gorm.DB) {
 	handler := NewStorylineHandler(db)
 
-	// 故事线路由
-	r.GET("/storylines/:novelId", handler.GetStorylines)
-	r.POST("/storylines", handler.CreateStoryline)
-	r.PUT("/storylines/:id", handler.UpdateStoryline)
-	r.DELETE("/storylines/:id", handler.DeleteStoryline)
+	storylines := r.Group("/storylines")
+	storylines.Use(middleware.RequireAuth()) // 添加认证中间件
+	{
+		storylines.GET("/:novelId", handler.GetStorylines)
+		storylines.POST("", handler.CreateStoryline)
+		storylines.PUT("/:id", handler.UpdateStoryline)
+		storylines.DELETE("/:id", handler.DeleteStoryline)
+	}
 
-	// 故事节点路由
-	r.GET("/story-nodes/:storylineId", handler.GetStoryNodes)
-	r.POST("/story-nodes", handler.CreateStoryNode)
-	r.PUT("/story-nodes/:id", handler.UpdateStoryNode)
-	r.DELETE("/story-nodes/:id", handler.DeleteStoryNode)
+	storyNodes := r.Group("/story-nodes")
+	storyNodes.Use(middleware.RequireAuth()) // 添加认证中间件
+	{
+		storyNodes.GET("/:storylineId", handler.GetStoryNodes)
+		storyNodes.POST("", handler.CreateStoryNode)
+		storyNodes.PUT("/:id", handler.UpdateStoryNode)
+		storyNodes.DELETE("/:id", handler.DeleteStoryNode)
+	}
 
-	// 节点连接路由
-	r.GET("/node-connections", handler.GetNodeConnections)
-	r.POST("/node-connections", handler.CreateNodeConnection)
-	r.DELETE("/node-connections/:id", handler.DeleteNodeConnection)
+	nodeConnections := r.Group("/node-connections")
+	nodeConnections.Use(middleware.RequireAuth()) // 添加认证中间件
+	{
+		nodeConnections.GET("", handler.GetNodeConnections)
+		nodeConnections.POST("", handler.CreateNodeConnection)
+		nodeConnections.DELETE("/:id", handler.DeleteNodeConnection)
+	}
 }

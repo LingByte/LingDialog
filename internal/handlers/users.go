@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	LingEcho "github.com/LingByte/LingDialog"
 	"github.com/LingByte/LingDialog/internal/models"
 	"github.com/LingByte/LingDialog/pkg/constants"
 	"github.com/LingByte/LingDialog/pkg/logger"
@@ -51,61 +50,6 @@ func (h *Handlers) handleUserInfo(c *gin.Context) {
 		}
 	}
 	response.Success(c, "success", user)
-}
-
-// handleUserSigninByEmail handle user signin by email
-func (h *Handlers) handleUserSigninByEmail(c *gin.Context) {
-	var form models.EmailOperatorForm
-	if err := c.BindJSON(&form); err != nil {
-		LingEcho.AbortWithJSONError(c, http.StatusBadRequest, err)
-		return
-	}
-
-	// 检查邮箱是否为空
-	if form.Email == "" {
-		LingEcho.AbortWithJSONError(c, http.StatusBadRequest, errors.New("email is required"))
-		return
-	}
-
-	db := c.MustGet(constants.DbField).(*gorm.DB)
-	// 获取用户
-	user, err := models.GetUserByEmail(db, form.Email)
-	if err != nil {
-		response.Fail(c, "user not exists", errors.New("user not exists"))
-		return
-	}
-	if form.Code == "" {
-		LingEcho.AbortWithJSONError(c, http.StatusBadRequest, errors.New("verification code is required"))
-		return
-	}
-	// 从缓存中获取验证码
-	cachedCode, ok := utils.GlobalCache.Get(form.Email)
-	if !ok || cachedCode != form.Code {
-		LingEcho.AbortWithJSONError(c, http.StatusBadRequest, errors.New("invalid verification code"))
-		return
-	}
-
-	// 清除已用验证码
-	utils.GlobalCache.Remove(form.Email)
-	err = models.CheckUserAllowLogin(db, user)
-	if err != nil {
-		LingEcho.AbortWithJSONError(c, http.StatusForbidden, err)
-		return
-	}
-	// 设置时区（如果有的话）
-	if form.Timezone != "" {
-		models.InTimezone(c, form.Timezone)
-	}
-	// 登录用户，设置 Session
-	models.Login(c, user)
-
-	// 生成token
-	token := generateSimpleToken(user.ID)
-
-	response.Success(c, "Login successful", gin.H{
-		"user":  user,
-		"token": token,
-	})
 }
 
 // handleUserSigninByPassword handle user signin by password
@@ -229,45 +173,6 @@ func (h *Handlers) handleUserRegister(c *gin.Context) {
 	response.Success(c, "Registration successful", gin.H{
 		"user":  user,
 		"token": token,
-	})
-}
-
-// handleSendEmailCode handle sending email verification code
-func (h *Handlers) handleSendEmailCode(c *gin.Context) {
-	var form struct {
-		Email string `json:"email" binding:"required,email"`
-		Type  string `json:"type,omitempty"` // login, register, reset
-	}
-
-	if err := c.ShouldBindJSON(&form); err != nil {
-		response.Fail(c, "Invalid request", err)
-		return
-	}
-
-	// 生成6位数字验证码
-	code := generateVerificationCode()
-
-	// 根据类型设置不同的缓存key和过期时间
-	cacheKey := form.Email
-	if form.Type == "register" {
-		cacheKey = form.Email + "_register"
-	} else if form.Type == "reset" {
-		cacheKey = form.Email + "_reset"
-	}
-
-	// 存储验证码到缓存，5分钟过期
-	utils.GlobalCache.Add(cacheKey, code)
-
-	// TODO: 这里应该发送真实的邮件，现在只是模拟
-	logger.Info("Email verification code",
-		zap.String("email", form.Email),
-		zap.String("code", code),
-		zap.String("type", form.Type))
-
-	response.Success(c, "Verification code sent", gin.H{
-		"message": "Please check your email for verification code",
-		// 开发环境下返回验证码，生产环境应该移除
-		"code": code,
 	})
 }
 

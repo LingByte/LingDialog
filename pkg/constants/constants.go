@@ -1,5 +1,21 @@
 package constants
 
+const (
+	TABLE_CHAPTER         = "chapters"
+	TABLE_CHARACTER       = "characters"
+	TABLE_NOVEL           = "novels"
+	TABLE_PLOT_POINT      = "plot_points"
+	TABLE_NOVEL_SETTING   = "novel_settings"
+	TABLE_STORYLINE       = "storylines"
+	TABLE_STORY_NODE      = "story_nodes"
+	TABLE_NODE_CONNECTION = "node_connections"
+	TABLE_VOLUME          = "volumes"
+	TABLE_USER            = "users"
+	TABLE_CHAT_SESSION    = "chat_sessions"
+	TABLE_CHAT_MESSAGE    = "chat_messages"
+	TABLE_CHAT_USAGE      = "chat_usage"
+)
+
 // Default Value: 1024
 const ENV_CONFIG_CACHE_SIZE = "CONFIG_CACHE_SIZE"
 
@@ -53,23 +69,5 @@ const KEY_SEARCH_PATH = "SEARCH_PATH"
 const KEY_SEARCH_BATCH_SIZE = "SEARCH_BATCH_SIZE"
 const KEY_SEARCH_INDEX_SCHEDULE = "SEARCH_INDEX_SCHEDULE"
 
-// Voice clone configuration keys
-const KEY_VOICE_CLONE_XUNFEI_CONFIG = "VOICE_CLONE_XUNFEI_CONFIG"
-const KEY_VOICE_CLONE_VOLCENGINE_CONFIG = "VOICE_CLONE_VOLCENGINE_CONFIG"
-
-// OTA and device configuration keys
-const KEY_SERVER_WEBSOCKET = "server.websocket"
-const KEY_SERVER_MQTT_GATEWAY = "server.mqtt_gateway"
-const KEY_SERVER_OTA = "server.ota"
-const KEY_SERVER_MQTT_SIGNATURE_KEY = "server.mqtt_signature_key"
-const KEY_SERVER_FRONTED_URL = "server.fronted_url"
-
 const ENV_STATIC_PREFIX = "STATIC_PREFIX"
 const ENV_STATIC_ROOT = "STATIC_ROOT"
-
-const (
-	CONFIG_REDIS_ADDR     = "CONFIG_REDIS_ADDR"
-	CONFIG_REDIS_PORT     = "CONFIG_REDIS_PORT"
-	CONFIG_REDIS_PASSWORD = "CONFIG_REDIS_PASSWORD"
-	CONFIG_REDIS_DB       = "CONFIG_REDIS_DB"
-)

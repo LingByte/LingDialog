@@ -23,6 +23,14 @@ axiosInstance.interceptors.request.use(
     const token = localStorage.getItem('auth_token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
+      console.log('请求携带token:', { 
+        url: config.url, 
+        hasToken: !!token, 
+        tokenLength: token.length,
+        tokenPrefix: token.substring(0, 20) + '...'
+      })
+    } else {
+      console.log('请求未携带token:', { url: config.url })
     }
     
     // 如果是FormData，让浏览器自动设置Content-Type（包含boundary）
@@ -62,8 +70,8 @@ axiosInstance.interceptors.response.use(
       switch (status) {
         case 401:
             console.log('Unauthorized')
-            useAuthStore.getState().clearUser()
-            // window.location.href = '/'
+            // 不要自动清除用户状态，让组件自己处理
+            // useAuthStore.getState().clearUser()
             console.log('Unauthorized: Please log in')
           break
         case 403:

@@ -123,7 +123,7 @@ func RegisterHandlerWithAutoGen(prefix string, r *gin.Engine, uriDocs []UriDoc, 
 			scheme = "https"
 		}
 		baseURL := scheme + "://" + ctx.Request.Host
-		openapiGen := docsPkg.NewOpenAPIGenerator(baseURL, "1.0.0", "LingFramework API")
+		openapiGen := docsPkg.NewOpenAPIGenerator(baseURL, "1.0.0", "LingDialogue API")
 		// 转换类型
 		docsUriDocs := make([]docsPkg.UriDoc, len(uriDocs))
 		for i, doc := range uriDocs {
