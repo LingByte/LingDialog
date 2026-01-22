@@ -152,5 +152,8 @@ func RunMigrations(db *gorm.DB) error {
 		&models.ChatSession{},
 		&models.ChatMessage{},
 		&models.ChatUsage{},
+		&models.WritingGoal{},
+		&models.WritingProgress{},
+		&models.Activity{},
 	})
 }

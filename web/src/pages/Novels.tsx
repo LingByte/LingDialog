@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Plus, BookOpen, Search, Edit, Trash2, Eye } from 'lucide-react'
 import { novelsApi, type Novel } from '@/api/novels'
+import Layout from '@/components/Layout/Layout'
 import Button from '@/components/UI/Button'
 import Input from '@/components/UI/Input'
 import Card from '@/components/UI/Card'
@@ -66,8 +67,9 @@ export default function Novels() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+    <Layout>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -169,6 +171,7 @@ export default function Novels() {
         )}
       </div>
     </div>
+    </Layout>
   )
 }
 

@@ -79,8 +79,8 @@ func main() {
 	// 7. Load Data Source
 	db, err := bootstrap.SetupDatabase(os.Stdout, &bootstrap.Options{
 		InitSQLPath: *initSQL, // Can be specified via --init-sql
-		AutoMigrate: true,     // Whether to migrate entities
-		SeedNonProd: true,
+		AutoMigrate: false,    // Whether to migrate entities
+		SeedNonProd: false,
 	})
 	if err != nil {
 		logger.Error("database setup failed", zap.Error(err))

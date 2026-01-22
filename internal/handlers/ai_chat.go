@@ -99,7 +99,9 @@ func (h *AIHandler) Chat(c *gin.Context) {
 	logger.Info("Chat request received",
 		zap.Int("messageCount", len(req.Messages)),
 		zap.Bool("stream", req.Stream),
-		zap.Any("sessionId", req.SessionID))
+		zap.Any("sessionId", req.SessionID),
+		zap.Any("novelId", req.NovelID),
+		zap.String("title", req.Title))
 
 	// 如果是流式请求，使用流式处理
 	if req.Stream {
@@ -137,6 +139,7 @@ func (h *AIHandler) chatNormal(c *gin.Context, req ChatRequest, userID uint) {
 
 	// 如果指定了小说 ID，添加小说上下文
 	if req.NovelID != nil {
+		logger.Info("开始构建小说上下文", zap.Uint("novelID", *req.NovelID))
 		contextMessage, err := h.buildNovelContext(*req.NovelID)
 		if err != nil {
 			logger.Error("Failed to build novel context", zap.Error(err))
@@ -149,7 +152,12 @@ func (h *AIHandler) chatNormal(c *gin.Context, req ChatRequest, userID uint) {
 		if contextMessage != nil {
 			// 将上下文消息插入到消息列表开头
 			messages = append([]llm.Message{*contextMessage}, messages...)
+			logger.Info("小说上下文已添加到消息列表",
+				zap.Int("contextLength", len(contextMessage.Content)),
+				zap.Int("totalMessages", len(messages)))
 		}
+	} else {
+		logger.Info("未指定小说ID，跳过上下文构建")
 	}
 
 	// 调用 LLM
@@ -243,6 +251,7 @@ func (h *AIHandler) chatStream(c *gin.Context, req ChatRequest, userID uint) {
 
 	// 如果指定了小说 ID，添加小说上下文
 	if req.NovelID != nil {
+		logger.Info("开始构建小说上下文（流式）", zap.Uint("novelID", *req.NovelID))
 		contextMessage, err := h.buildNovelContext(*req.NovelID)
 		if err != nil {
 			logger.Error("Failed to build novel context", zap.Error(err))
@@ -252,7 +261,12 @@ func (h *AIHandler) chatStream(c *gin.Context, req ChatRequest, userID uint) {
 		if contextMessage != nil {
 			// 将上下文消息插入到消息列表开头
 			messages = append([]llm.Message{*contextMessage}, messages...)
+			logger.Info("小说上下文已添加到消息列表（流式）",
+				zap.Int("contextLength", len(contextMessage.Content)),
+				zap.Int("totalMessages", len(messages)))
 		}
+	} else {
+		logger.Info("未指定小说ID，跳过上下文构建（流式）")
 	}
 
 	// 创建流式回调
@@ -592,6 +606,8 @@ func (h *AIHandler) getOrCreateSession(sessionID *uint, userID uint, novelID *ui
 
 // buildNovelContext 构建小说上下文信息
 func (h *AIHandler) buildNovelContext(novelID uint) (*llm.Message, error) {
+	logger.Info("开始构建小说上下文", zap.Uint("novelID", novelID))
+
 	// 获取小说基本信息
 	var novel models.Novel
 	if err := h.db.First(&novel, novelID).Error; err != nil {
@@ -606,12 +622,42 @@ func (h *AIHandler) buildNovelContext(novelID uint) (*llm.Message, error) {
 	var plotPoints []models.PlotPoint
 	h.db.Where("novel_id = ?", novelID).Find(&plotPoints)
 
-	// 获取最近的章节信息（最多5章）
+	// 获取所有章节信息（按顺序排列）
 	var chapters []models.Chapter
 	h.db.Where("novel_id = ?", novelID).
-		Order("order DESC").
-		Limit(5).
+		Order("order ASC").
 		Find(&chapters)
+
+	// 自动为没有摘要的章节生成摘要
+	for i := range chapters {
+		if chapters[i].Summary == "" && chapters[i].Content != "" {
+			logger.Info("为章节自动生成摘要",
+				zap.Uint("chapterID", chapters[i].ID),
+				zap.String("chapterTitle", chapters[i].Title))
+
+			summary, err := h.chapterGenerator.GenerateSummary(chapters[i].Title, chapters[i].Content)
+			if err != nil {
+				logger.Error("自动生成章节摘要失败",
+					zap.Uint("chapterID", chapters[i].ID),
+					zap.Error(err))
+				continue
+			}
+
+			// 更新章节摘要
+			h.db.Model(&chapters[i]).Update("summary", summary)
+			chapters[i].Summary = summary
+
+			logger.Info("章节摘要自动生成成功",
+				zap.Uint("chapterID", chapters[i].ID),
+				zap.Int("summaryLength", len(summary)))
+		}
+	}
+
+	logger.Info("获取小说相关数据",
+		zap.String("title", novel.Title),
+		zap.Int("characters", len(characters)),
+		zap.Int("plotPoints", len(plotPoints)),
+		zap.Int("chapters", len(chapters)))
 
 	// 构建上下文内容
 	var contextParts []string
@@ -647,25 +693,124 @@ func (h *AIHandler) buildNovelContext(novelID uint) (*llm.Message, error) {
 		}
 	}
 
-	// 最近章节信息
+	// 所有章节的完整内容
 	if len(chapters) > 0 {
-		contextParts = append(contextParts, "\n# 最近章节")
-		// 按顺序排列（从早到晚）
-		for i := len(chapters) - 1; i >= 0; i-- {
-			chapter := chapters[i]
-			contextParts = append(contextParts, fmt.Sprintf("## 第%d章：%s", chapter.Order, chapter.Title))
+		contextParts = append(contextParts, "\n# 已有章节内容")
+
+		// 计算总字符数，避免上下文过长
+		totalContentLength := 0
+		const maxContentLength = 50000 // 限制总内容长度，避免超出token限制
+
+		logger.Info("开始处理章节内容", zap.Int("chapterCount", len(chapters)))
+
+		for i, chapter := range chapters {
+			chapterContent := fmt.Sprintf("\n## 第%d章：%s", chapter.Order, chapter.Title)
+
+			// 添加章节摘要（如果有）
 			if chapter.Summary != "" {
-				contextParts = append(contextParts, fmt.Sprintf("摘要：%s", chapter.Summary))
+				chapterContent += fmt.Sprintf("\n【章节摘要】%s", chapter.Summary)
 			}
+
+			// 添加章节完整内容
+			if chapter.Content != "" {
+				logger.Info("处理章节内容",
+					zap.Int("chapterOrder", chapter.Order),
+					zap.String("chapterTitle", chapter.Title),
+					zap.Int("contentLength", len(chapter.Content)))
+
+				// 检查是否会超出长度限制
+				contentToAdd := fmt.Sprintf("\n【章节内容】\n%s", chapter.Content)
+				if totalContentLength+len(chapterContent)+len(contentToAdd) > maxContentLength {
+					// 如果会超出限制，只添加部分内容
+					remainingLength := maxContentLength - totalContentLength - len(chapterContent)
+					if remainingLength > 100 {
+						truncatedContent := chapter.Content
+						if len(truncatedContent) > remainingLength-50 {
+							truncatedContent = truncatedContent[:remainingLength-50] + "...(内容过长，已截断)"
+						}
+						chapterContent += fmt.Sprintf("\n【章节内容】\n%s", truncatedContent)
+						logger.Warn("章节内容被截断",
+							zap.Int("originalLength", len(chapter.Content)),
+							zap.Int("truncatedLength", len(truncatedContent)))
+					} else {
+						chapterContent += "\n【章节内容】（内容过长，已省略）"
+						logger.Warn("章节内容被省略", zap.Int("chapterOrder", chapter.Order))
+					}
+					contextParts = append(contextParts, chapterContent)
+					contextParts = append(contextParts, "---")
+					contextParts = append(contextParts, "\n【注意】由于内容过长，部分章节内容已被截断或省略。")
+					logger.Warn("达到内容长度限制，停止添加更多章节",
+						zap.Int("processedChapters", i+1),
+						zap.Int("totalChapters", len(chapters)))
+					break
+				} else {
+					chapterContent += contentToAdd
+				}
+			} else {
+				chapterContent += "\n【章节内容】（暂无内容）"
+				logger.Info("章节无内容", zap.Int("chapterOrder", chapter.Order))
+			}
+
+			// 添加分隔线
+			chapterContent += "\n---"
+
+			contextParts = append(contextParts, chapterContent)
+			totalContentLength += len(chapterContent)
 		}
+
+		// 添加章节统计信息
+		contextParts = append(contextParts, fmt.Sprintf("\n【统计信息】当前共有 %d 章节", len(chapters)))
+	} else {
+		contextParts = append(contextParts, "\n# 已有章节内容\n暂无章节内容")
 	}
 
-	contextParts = append(contextParts, "\n# 角色设定\n你是一个专业的小说创作助手，专门帮助作者讨论和完善小说创作。请基于以上小说信息，为用户提供专业的创作建议、情节讨论和写作指导。重点关注：\n- 情节发展和走向\n- 角色成长和关系\n- 世界观构建和完善\n- 冲突设置和解决\n- 写作技巧和风格\n- 后续章节规划, 请返回纯文本，不要返回任何Markdown或者JSON")
+	contextParts = append(contextParts, "\n# 角色设定\n你是一个专业的小说创作助手，专门帮助作者讨论和完善小说创作。请基于以上小说信息和已有章节内容，为用户提供专业的创作建议、情节讨论和写作指导。重点关注：\n- 基于已有章节的情节发展和走向\n- 角色在已有章节中的成长轨迹和后续发展\n- 世界观在已有章节中的展现和需要完善的地方\n- 已有章节中的冲突设置和后续解决方案\n- 保持与已有章节风格一致的写作技巧\n- 基于当前进度的后续章节规划\n- 分析已有章节的优缺点并提供改进建议\n\n请返回纯文本，不要返回任何Markdown或者JSON格式。在回答时，请充分考虑已有章节的内容和发展脉络。")
 
 	context := strings.Join(contextParts, "\n")
+
+	logger.Info("小说上下文构建完成",
+		zap.Int("contextLength", len(context)),
+		zap.Int("totalParts", len(contextParts)))
 
 	return &llm.Message{
 		Role:    "system",
 		Content: context,
 	}, nil
+}
+
+// TestBuildNovelContext 测试构建小说上下文（仅用于测试）
+func (h *AIHandler) TestBuildNovelContext(novelID uint) (*llm.Message, error) {
+	return h.buildNovelContext(novelID)
+}
+
+// DebugNovelContext 调试小说上下文构建（仅用于开发调试）
+func (h *AIHandler) DebugNovelContext(c *gin.Context) {
+	novelIDStr := c.Param("novelId")
+	novelID, err := strconv.ParseUint(novelIDStr, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": 400,
+			"msg":  "小说ID格式错误",
+		})
+		return
+	}
+
+	contextMessage, err := h.buildNovelContext(uint(novelID))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code": 500,
+			"msg":  "构建上下文失败: " + err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": 200,
+		"msg":  "success",
+		"data": map[string]interface{}{
+			"novelId":       novelID,
+			"contextLength": len(contextMessage.Content),
+			"context":       contextMessage.Content,
+		},
+	})
 }

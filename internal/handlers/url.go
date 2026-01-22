@@ -168,6 +168,9 @@ func (h *Handlers) Register(engine *gin.Engine) {
 	// Register Setting routes
 	RegisterSettingRoutes(r, h.db)
 
+	// Register Writing Stats routes
+	RegisterWritingStatsRoutes(r, h.db)
+
 	if config.GlobalConfig.DocsPrefix != "" {
 		var objDocs []LingEcho.WebObjectDoc
 		for _, obj := range objs {

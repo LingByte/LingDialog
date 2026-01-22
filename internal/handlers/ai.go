@@ -77,6 +77,8 @@ func RegisterAIRoutes(r *gin.RouterGroup, db *gorm.DB) {
 			chat.GET("/sessions/:sessionId/messages", handler.GetSessionMessages)
 			chat.DELETE("/sessions/:sessionId", handler.DeleteSession)
 			chat.GET("/usage", handler.GetUsageStats)
+			// 调试端点（仅用于开发）
+			chat.GET("/debug/context/:novelId", handler.DebugNovelContext)
 		}
 
 		// 小说设定生成

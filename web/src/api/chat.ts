@@ -135,6 +135,15 @@ export const chatStream = async (
   title?: string
 ) => {
   try {
+    console.log('chatStream 调用参数:', {
+      messageCount: messages.length,
+      temperature,
+      maxTokens,
+      novelId,
+      sessionId,
+      title
+    });
+
     // 获取认证token
     const token = localStorage.getItem('auth_token')
     
@@ -157,18 +166,22 @@ export const chatStream = async (
     
     // 使用完整的 API URL
     const apiBaseURL = getApiBaseURL()
+    const requestBody = {
+      sessionId,
+      messages,
+      stream: true,
+      temperature,
+      maxTokens,
+      novelId,
+      title,
+    };
+    
+    console.log('发送到后端的请求体:', requestBody);
+    
     const response = await fetch(`${apiBaseURL}/ai/chat`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({
-        sessionId,
-        messages,
-        stream: true,
-        temperature,
-        maxTokens,
-        novelId,
-        title,
-      }),
+      body: JSON.stringify(requestBody),
     })
 
     if (!response.ok) {

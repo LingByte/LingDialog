@@ -1,19 +1,156 @@
 package llm
 
 import (
+	"context"
 	"fmt"
 	"time"
 
+	"github.com/LingByte/LingDialog/pkg/config"
 	"github.com/LingByte/LingDialog/pkg/logger"
 	"github.com/google/uuid"
 	"github.com/sashabaranov/go-openai"
 	"go.uber.org/zap"
 )
 
+// LLMHandler 兼容现有代码的LLM处理器
+type LLMHandler struct {
+	client *openai.Client
+	ctx    context.Context
+}
+
+// NewLLMHandler 创建LLM处理器（兼容现有代码）
+func NewLLMHandler(ctx context.Context, apiKey, baseURL, model string) *LLMHandler {
+	config := openai.DefaultConfig(apiKey)
+	if baseURL != "" {
+		config.BaseURL = baseURL
+	}
+
+	return &LLMHandler{
+		client: openai.NewClientWithConfig(config),
+		ctx:    ctx,
+	}
+}
+
+// QueryOptions 查询选项
+type QueryOptions struct {
+	Model       string
+	Temperature *float32
+	MaxTokens   *int
+	Stream      bool
+}
+
+// QueryWithOptions 使用选项查询
+func (h *LLMHandler) QueryWithOptions(prompt string, options QueryOptions) (string, error) {
+	// 构建请求
+	request := openai.ChatCompletionRequest{
+		Model: options.Model,
+		Messages: []openai.ChatCompletionMessage{
+			{
+				Role:    "user",
+				Content: prompt,
+			},
+		},
+	}
+
+	if options.Temperature != nil {
+		request.Temperature = *options.Temperature
+	}
+	if options.MaxTokens != nil {
+		request.MaxTokens = *options.MaxTokens
+	}
+
+	// 调用 OpenAI API
+	resp, err := h.client.CreateChatCompletion(h.ctx, request)
+	if err != nil {
+		return "", err
+	}
+
+	if len(resp.Choices) == 0 {
+		return "", fmt.Errorf("no response from LLM")
+	}
+
+	return resp.Choices[0].Message.Content, nil
+}
+
+// QueryStream 流式查询
+func (h *LLMHandler) QueryStream(prompt string, options QueryOptions, callback func(segment string, isComplete bool) error) (string, error) {
+	// 构建请求
+	request := openai.ChatCompletionRequest{
+		Model: options.Model,
+		Messages: []openai.ChatCompletionMessage{
+			{
+				Role:    "user",
+				Content: prompt,
+			},
+		},
+		Stream: true,
+	}
+
+	if options.Temperature != nil {
+		request.Temperature = *options.Temperature
+	}
+	if options.MaxTokens != nil {
+		request.MaxTokens = *options.MaxTokens
+	}
+
+	// 调用流式API
+	stream, err := h.client.CreateChatCompletionStream(h.ctx, request)
+	if err != nil {
+		return "", err
+	}
+	defer stream.Close()
+
+	var fullResponse string
+	for {
+		response, err := stream.Recv()
+		if err != nil {
+			if err.Error() == "EOF" {
+				// 调用完成回调
+				if callback != nil {
+					callback("", true)
+				}
+				break
+			}
+			return "", err
+		}
+
+		if len(response.Choices) > 0 {
+			content := response.Choices[0].Delta.Content
+			if content != "" {
+				fullResponse += content
+				// 调用进度回调
+				if callback != nil {
+					if err := callback(content, false); err != nil {
+						return fullResponse, err
+					}
+				}
+			}
+		}
+	}
+
+	return fullResponse, nil
+}
+
+// Float32Ptr 返回float32指针
+func Float32Ptr(f float32) *float32 {
+	return &f
+}
+
+// IntPtr 返回int指针
+func IntPtr(i int) *int {
+	return &i
+}
+
 // Message 通用消息结构
 type Message struct {
 	Role    string `json:"role"`    // user, assistant, system
 	Content string `json:"content"` // 消息内容
+}
+
+// GetModel 获取模型名称
+func GetModel() string {
+	_, _, model := config.GetLLMConfig()
+	return model
 }
 
 // Chat 通用聊天方法（非流式）

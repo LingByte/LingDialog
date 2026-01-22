@@ -7,9 +7,11 @@ import (
 	"github.com/LingByte/LingDialog/internal/models"
 	"github.com/LingByte/LingDialog/pkg/config"
 	"github.com/LingByte/LingDialog/pkg/constants"
+	"github.com/LingByte/LingDialog/pkg/logger"
 	"github.com/LingByte/LingDialog/pkg/search"
 	"github.com/LingByte/LingDialog/pkg/utils"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -63,6 +65,39 @@ func (h *Handlers) GetObjs() []LingEcho.WebObject {
 			Editables:   []string{"Title", "Content", "Order", "Summary", "CharacterIDs", "PlotPointIDs", "PreviousSummary", "Outline", "Status", "NovelID", "VolumeID"},
 			Searchables: []string{"Title", "Content"},
 			Orderables:  []string{"Order", "UpdatedAt", "CreatedAt", "Title"},
+			BeforeUpdate: func(db *gorm.DB, ctx *gin.Context, vptr any, vals map[string]any) error {
+				// 如果更新了内容但没有摘要，自动生成摘要
+				if content, hasContent := vals["Content"]; hasContent && content != nil {
+					if summary, hasSummary := vals["Summary"]; !hasSummary || summary == nil || summary == "" {
+						contentStr, ok := content.(string)
+						if ok && contentStr != "" {
+							// 获取章节标题
+							var title string
+							if titleVal, hasTitle := vals["Title"]; hasTitle && titleVal != nil {
+								title, _ = titleVal.(string)
+							}
+							if title == "" {
+								// 从数据库获取现有标题
+								chapter := vptr.(*models.Chapter)
+								if chapter.Title != "" {
+									title = chapter.Title
+								} else {
+									title = "未命名章节"
+								}
+							}
+
+							// 这里我们需要AI处理器来生成摘要
+							// 由于在WebObject钩子中无法直接访问AI处理器，
+							// 我们先跳过自动生成，让用户手动生成
+							// 或者在聊天上下文构建时自动生成
+							logger.Info("章节内容已更新，建议生成摘要",
+								zap.String("title", title),
+								zap.Int("contentLength", len(contentStr)))
+						}
+					}
+				}
+				return nil
+			},
 		},
 		{
 			Group:       "novel",

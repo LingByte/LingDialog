@@ -209,6 +209,13 @@ export default function Chat() {
         const contextMessages = messages.map(m => ({ role: m.role, content: m.content }));
         contextMessages.push(userMessage);
 
+        console.log('发送聊天请求:', {
+            selectedNovelId: selectedNovel?.id,
+            selectedNovelTitle: selectedNovel?.title,
+            sessionId: currentSession?.id,
+            messageCount: contextMessages.length
+        });
+
         await chatStream(
             contextMessages,
             // onMessage

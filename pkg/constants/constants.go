@@ -1,19 +1,22 @@
 package constants
 
 const (
-	TABLE_CHAPTER         = "chapters"
-	TABLE_CHARACTER       = "characters"
-	TABLE_NOVEL           = "novels"
-	TABLE_PLOT_POINT      = "plot_points"
-	TABLE_NOVEL_SETTING   = "novel_settings"
-	TABLE_STORYLINE       = "storylines"
-	TABLE_STORY_NODE      = "story_nodes"
-	TABLE_NODE_CONNECTION = "node_connections"
-	TABLE_VOLUME          = "volumes"
-	TABLE_USER            = "users"
-	TABLE_CHAT_SESSION    = "chat_sessions"
-	TABLE_CHAT_MESSAGE    = "chat_messages"
-	TABLE_CHAT_USAGE      = "chat_usage"
+	TABLE_CHAPTER          = "chapters"
+	TABLE_CHARACTER        = "characters"
+	TABLE_NOVEL            = "novels"
+	TABLE_PLOT_POINT       = "plot_points"
+	TABLE_NOVEL_SETTING    = "novel_settings"
+	TABLE_STORYLINE        = "storylines"
+	TABLE_STORY_NODE       = "story_nodes"
+	TABLE_NODE_CONNECTION  = "node_connections"
+	TABLE_VOLUME           = "volumes"
+	TABLE_USER             = "users"
+	TABLE_CHAT_SESSION     = "chat_sessions"
+	TABLE_CHAT_MESSAGE     = "chat_messages"
+	TABLE_CHAT_USAGE       = "chat_usage"
+	TABLE_WRITING_GOAL     = "writing_goals"
+	TABLE_WRITING_PROGRESS = "writing_progress"
+	TABLE_ACTIVITY         = "activities"
 )
 
 // Default Value: 1024
