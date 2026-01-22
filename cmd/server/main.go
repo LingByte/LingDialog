@@ -159,7 +159,6 @@ func main() {
 			"/metrics",
 			"/static/",
 			"/uploads/",
-			"/media/", // keep for backward compatibility
 		},
 	})
 	r.Use(middleware.RateLimiterMiddleware())
@@ -176,7 +175,6 @@ func main() {
 		apiPrefix = "/api"
 	}
 	r.Static(apiPrefix+"/uploads", uploadDir)
-	r.Static(apiPrefix+"/media", uploadDir)
 	// Add /api/static route to serve static files under API prefix
 	// This is needed for SDK files accessed via /api/static/js/lingecho-sdk.js
 	staticRootDir := utils.GetEnv(constants.ENV_STATIC_ROOT)

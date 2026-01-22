@@ -35,3 +35,4 @@ ling.db
 logs/
 test_search/
 node_modules/
+*/dist/*

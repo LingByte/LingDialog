@@ -172,34 +172,41 @@ const Register: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 flex items-center justify-center p-4">
       <FadeIn>
-        <Card className="w-full max-w-lg p-8 shadow-xl">
+        <Card className="w-full max-w-lg p-10 shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
+          {/* 头部 */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">创建账户</h1>
-            <p className="text-gray-600">加入我们，开始您的创作之旅</p>
+            <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">创建账户</h1>
+            <p className="text-gray-600 text-sm">加入我们，开始您的创作之旅</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 邮箱地址 *
               </label>
-              <div className="flex space-x-2">
+              <div className="flex space-x-3">
                 <Input
                   type="email"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   placeholder="请输入邮箱地址"
                   required
-                  className="flex-1"
+                  className="flex-1 h-12"
+                  inputClassName="text-base px-4"
                 />
                 <Button
                   type="button"
                   variant="outline"
                   onClick={handleSendCode}
                   disabled={countdown > 0 || !form.email}
-                  className="whitespace-nowrap"
+                  className="whitespace-nowrap h-12 px-6 text-sm border-gray-300 hover:border-green-500 hover:text-green-600"
                 >
                   {countdown > 0 ? `${countdown}s` : '发送验证码'}
                 </Button>
@@ -207,7 +214,7 @@ const Register: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 邮箱验证码 *
               </label>
               <Input
@@ -216,11 +223,13 @@ const Register: React.FC = () => {
                 onChange={(e) => setForm({ ...form, code: e.target.value })}
                 placeholder="请输入验证码"
                 required
+                className="h-12 w-full"
+                inputClassName="text-base px-4"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 显示名称
               </label>
               <Input
@@ -228,12 +237,14 @@ const Register: React.FC = () => {
                 value={form.displayName}
                 onChange={(e) => setForm({ ...form, displayName: e.target.value })}
                 placeholder="请输入显示名称"
+                className="h-12 w-full"
+                inputClassName="text-base px-4"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   姓
                 </label>
                 <Input
@@ -241,10 +252,12 @@ const Register: React.FC = () => {
                   value={form.lastName}
                   onChange={(e) => setForm({ ...form, lastName: e.target.value })}
                   placeholder="姓"
+                  className="h-12 w-full"
+                  inputClassName="text-base px-4"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   名
                 </label>
                 <Input
@@ -252,12 +265,14 @@ const Register: React.FC = () => {
                   value={form.firstName}
                   onChange={(e) => setForm({ ...form, firstName: e.target.value })}
                   placeholder="名"
+                  className="h-12 w-full"
+                  inputClassName="text-base px-4"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 密码 *
               </label>
               <Input
@@ -266,6 +281,8 @@ const Register: React.FC = () => {
                 onChange={(e) => handlePasswordChange(e.target.value)}
                 placeholder="请输入密码（至少6位）"
                 required
+                className="h-12 w-full"
+                inputClassName="text-base px-4"
               />
               {form.password && (
                 <div className="mt-2">
@@ -285,7 +302,7 @@ const Register: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 确认密码 *
               </label>
               <Input
@@ -294,27 +311,29 @@ const Register: React.FC = () => {
                 onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
                 placeholder="请再次输入密码"
                 required
+                className="h-12 w-full"
+                inputClassName="text-base px-4"
               />
               {form.confirmPassword && form.password !== form.confirmPassword && (
                 <p className="mt-1 text-sm text-red-600">密码不一致</p>
               )}
             </div>
 
-            <div className="flex items-start">
+            <div className="flex items-start pt-2">
               <input
                 type="checkbox"
                 checked={form.agreeTerms}
                 onChange={(e) => setForm({ ...form, agreeTerms: e.target.checked })}
-                className="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="mt-1 rounded border-gray-300 text-green-600 focus:ring-green-500 w-4 h-4"
                 required
               />
               <span className="ml-2 text-sm text-gray-600">
                 我已阅读并同意
-                <Link to="/terms" className="text-blue-600 hover:text-blue-500">
+                <Link to="/terms" className="text-green-600 hover:text-green-500 transition-colors">
                   用户协议
                 </Link>
                 和
-                <Link to="/privacy" className="text-blue-600 hover:text-blue-500">
+                <Link to="/privacy" className="text-green-600 hover:text-green-500 transition-colors">
                   隐私政策
                 </Link>
               </span>
@@ -322,7 +341,7 @@ const Register: React.FC = () => {
 
             <Button
               type="submit"
-              className="w-full"
+              className="w-full h-12 text-base font-medium bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 border-0 mt-6"
               loading={isLoading}
               disabled={!form.agreeTerms}
             >
@@ -331,10 +350,10 @@ const Register: React.FC = () => {
           </form>
 
           <div className="mt-6 text-center">
-            <span className="text-gray-600">已有账户？</span>
+            <span className="text-gray-600 text-sm">已有账户？</span>
             <Link
               to="/login"
-              className="ml-1 text-blue-600 hover:text-blue-500 font-medium"
+              className="ml-1 text-green-600 hover:text-green-500 font-medium text-sm transition-colors"
             >
               立即登录
             </Link>

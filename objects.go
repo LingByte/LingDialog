@@ -575,7 +575,7 @@ func handleDeleteObject(c *gin.Context, obj *WebObject) {
 
 	r := obj.buildPrimaryCondition(db, keys).Session(&gorm.Session{}).First(val)
 
-	// for gorm delete hook, need to load rtcmedia first.
+	// for gorm delete hook, need to load record first.
 	if r.Error != nil {
 		if errors.Is(r.Error, gorm.ErrRecordNotFound) {
 			response.Fail(c, "not found", nil)

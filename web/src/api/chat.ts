@@ -12,6 +12,7 @@ export interface ChatRequest {
   stream?: boolean
   temperature?: number
   maxTokens?: number
+  novelId?: number  // 添加小说 ID 支持
 }
 
 export interface ChatResponse {
@@ -42,7 +43,8 @@ export const chatStream = async (
   onComplete: () => void,
   onError: (error: string) => void,
   temperature: number = 0.7,
-  maxTokens: number = 2000
+  maxTokens: number = 2000,
+  novelId?: number  // 添加小说 ID 参数
 ) => {
   try {
     // 使用完整的 API URL
@@ -57,6 +59,7 @@ export const chatStream = async (
         stream: true,
         temperature,
         maxTokens,
+        novelId,  // 传递小说 ID
       }),
     })
 

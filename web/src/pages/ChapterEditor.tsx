@@ -45,6 +45,7 @@ export default function ChapterEditor() {
     type: string
   }>>([])
   const [selectedSuggestion, setSelectedSuggestion] = useState<number | null>(null)
+  const [suggestionFeedback, setSuggestionFeedback] = useState('') // 对所有建议的整体反馈
   const [feedback, setFeedback] = useState('')
   const [userRequirements, setUserRequirements] = useState('') // 用户对大纲/内容的额外要求
   const [generatedMetadata, setGeneratedMetadata] = useState<any>(null) // 存储 AI 生成的元数据
@@ -426,7 +427,112 @@ export default function ChapterEditor() {
       outline: suggestion.outline,
     })
     setShowSuggestionsPanel(false)
+    setSuggestionFeedback('')
     toast.success('已选择建议，可以继续生成内容')
+  }
+
+  const handleSubmitSuggestionFeedback = async () => {
+    if (!suggestionFeedback.trim()) {
+      toast.error('请输入反馈内容')
+      return
+    }
+
+    try {
+      setAiGeneratingSuggestions(true)
+      
+      // 获取前文摘要
+      const recentChapters = previousChapters
+        .filter(c => c.order < formData.order && c.summary)
+        .sort((a, b) => b.order - a.order)
+        .slice(0, 3)
+        
+      const previousSummary = recentChapters.length > 0 
+        ? recentChapters
+            .reverse()
+            .map(c => `第${c.order}章《${c.title}》: ${c.summary}`)
+            .join('\n\n')
+        : ''
+
+      // 构建包含反馈的请求
+      const feedbackContext = `
+用户对当前所有建议的反馈：${suggestionFeedback}
+
+请根据用户反馈重新生成改进的建议，确保新建议能够解决用户提出的问题。
+`
+
+      const response = await novelsApi.generateChapterSuggestions({
+        novelTitle: novel?.title || '',
+        novelGenre: novel?.genre,
+        worldSetting: novel?.worldSetting,
+        previousSummary: previousSummary + '\n\n' + feedbackContext,
+        chapterNumber: formData.order,
+      })
+
+      if (response.code === 200) {
+        if (response.data && response.data.suggestions && Array.isArray(response.data.suggestions)) {
+          setSuggestions(response.data.suggestions)
+          setSuggestionFeedback('')
+          toast.success(`根据反馈重新生成了${response.data.suggestions.length}个建议`)
+        } else {
+          toast.error('建议数据格式错误')
+        }
+      } else {
+        toast.error(response.msg || '重新生成建议失败')
+      }
+    } catch (error: any) {
+      toast.error(error.msg || error.message || '重新生成建议失败')
+    } finally {
+      setAiGeneratingSuggestions(false)
+    }
+  }
+
+  const handleRegenerateSuggestions = async () => {
+    try {
+      setAiGeneratingSuggestions(true)
+      
+      // 获取前文摘要
+      const recentChapters = previousChapters
+        .filter(c => c.order < formData.order && c.summary)
+        .sort((a, b) => b.order - a.order)
+        .slice(0, 3)
+        
+      const previousSummary = recentChapters.length > 0 
+        ? recentChapters
+            .reverse()
+            .map(c => `第${c.order}章《${c.title}》: ${c.summary}`)
+            .join('\n\n')
+        : ''
+
+      // 添加"换一批"的提示
+      const regenerateContext = `
+请生成与之前不同的章节发展方向，提供更多样化的选择。
+避免重复之前的建议类型和情节发展。
+`
+
+      const response = await novelsApi.generateChapterSuggestions({
+        novelTitle: novel?.title || '',
+        novelGenre: novel?.genre,
+        worldSetting: novel?.worldSetting,
+        previousSummary: previousSummary + '\n\n' + regenerateContext,
+        chapterNumber: formData.order,
+      })
+
+      if (response.code === 200) {
+        if (response.data && response.data.suggestions && Array.isArray(response.data.suggestions)) {
+          setSuggestions(response.data.suggestions)
+          setSuggestionFeedback('') // 清空反馈
+          toast.success(`换一批成功！生成了${response.data.suggestions.length}个新建议`)
+        } else {
+          toast.error('建议数据格式错误')
+        }
+      } else {
+        toast.error(response.msg || '换一批失败')
+      }
+    } catch (error: any) {
+      toast.error(error.msg || error.message || '换一批失败')
+    } finally {
+      setAiGeneratingSuggestions(false)
+    }
   }
 
   const handleSave = async () => {
@@ -944,19 +1050,33 @@ export default function ChapterEditor() {
       {/* 章节建议选择面板 */}
       {showSuggestionsPanel && suggestions.length > 0 && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-4xl max-h-[80vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-5xl max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">选择章节发展方向</h3>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowSuggestionsPanel(false)}
-              >
-                ✕
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRegenerateSuggestions}
+                  disabled={aiGeneratingSuggestions}
+                  leftIcon={aiGeneratingSuggestions ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                >
+                  {aiGeneratingSuggestions ? '生成中...' : '换一批'}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setShowSuggestionsPanel(false)
+                    setSuggestionFeedback('')
+                  }}
+                >
+                  ✕
+                </Button>
+              </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               {suggestions.map((suggestion, index) => (
                 <div
                   key={index}
@@ -989,14 +1109,43 @@ export default function ChapterEditor() {
                 </div>
               ))}
             </div>
-            
-            <div className="mt-6 flex justify-center">
-              <Button
-                variant="outline"
-                onClick={() => setShowSuggestionsPanel(false)}
-              >
-                取消选择
-              </Button>
+
+            {/* 反馈区域 */}
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-2">
+                  对这些建议有什么意见？
+                </label>
+                <Textarea
+                  value={suggestionFeedback}
+                  onChange={(e) => setSuggestionFeedback(e.target.value)}
+                  placeholder="例如：这些建议都太平淡了，希望有更激烈的冲突；节奏太快了，希望慢一些；希望增加更多角色互动..."
+                  rows={3}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  💡 AI 会根据您的反馈重新生成更符合期望的建议
+                </p>
+              </div>
+
+              <div className="flex gap-3 justify-between">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowSuggestionsPanel(false)
+                    setSuggestionFeedback('')
+                  }}
+                >
+                  取消选择
+                </Button>
+                
+                <Button
+                  onClick={handleSubmitSuggestionFeedback}
+                  disabled={aiGeneratingSuggestions || !suggestionFeedback.trim()}
+                  leftIcon={aiGeneratingSuggestions ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                >
+                  {aiGeneratingSuggestions ? '重新生成中...' : '根据反馈重新生成'}
+                </Button>
+              </div>
             </div>
           </div>
         </div>

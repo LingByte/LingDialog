@@ -6,10 +6,12 @@ import (
 	"github.com/LingByte/LingDialog/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 // AIHandler AI 相关的处理器
 type AIHandler struct {
+	db                 *gorm.DB
 	characterGenerator *llm.CharacterGenerator
 	plotGenerator      *llm.PlotGenerator
 	chapterGenerator   *llm.ChapterGenerator
@@ -19,7 +21,7 @@ type AIHandler struct {
 }
 
 // NewAIHandler 创建 AI 处理器
-func NewAIHandler() *AIHandler {
+func NewAIHandler(db *gorm.DB) *AIHandler {
 	// 从配置中获取 LLM 设置
 	apiKey, baseURL, model := config.GetLLMConfig()
 
@@ -48,6 +50,7 @@ func NewAIHandler() *AIHandler {
 	settingGenerator := llm.NewSettingGenerator(apiKey, baseURL, model)
 
 	return &AIHandler{
+		db:                 db,
 		characterGenerator: characterGenerator,
 		plotGenerator:      plotGenerator,
 		chapterGenerator:   chapterGenerator,
@@ -58,8 +61,8 @@ func NewAIHandler() *AIHandler {
 }
 
 // RegisterAIRoutes 注册 AI 相关路由
-func RegisterAIRoutes(r *gin.RouterGroup) {
-	handler := NewAIHandler()
+func RegisterAIRoutes(r *gin.RouterGroup, db *gorm.DB) {
+	handler := NewAIHandler(db)
 
 	ai := r.Group("/ai")
 	{

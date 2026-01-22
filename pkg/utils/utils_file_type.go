@@ -11,13 +11,11 @@ const (
 	FILE_TYPE_IMAGE int32 = 3
 	FILE_TYPE_FILE  int32 = 4
 	FILE_TYPE_AUDIO int32 = 5
-	FILE_TYPE_MEDIA int32 = 6
 )
 
 var (
 	imageSuffixes = map[string]interface{}{"jpeg": 1, "jpg": 1, "png": 1, "gif": 1, "tif": 1, "bmp": 1, "dwg": 1}
 	audioSuffixes = map[string]interface{}{"mp3": 1, "wma": 1, "wav": 1, "mid": 1, "ape": 1, "flac": 1}
-	mediaSuffixes = map[string]interface{}{"rmvb": 1, "flv": 1, "mp4": 1, "mpg": 1, "mpeg": 1, "avi": 1, "rm": 1, "mov": 1, "wmv": 1, "webm": 1}
 	fileTypes     = map[string]string{}
 )
 
@@ -49,20 +47,10 @@ func init() {
 	setFileType("504b0304140006000800", "docx")         //docx file
 	setFileType("d0cf11e0a1b11ae10000", "wps")          //WPS text wps, spreadsheet et, presentation dps are all the same
 
-	setFileType("2e524d46000000120001", "rmvb") //rmvb/rm same
-	setFileType("464c5601050000000900", "flv")  //flv and f4v same
-	setFileType("00000020667479706d70", "mp4")
-	setFileType("49443303000000002176", "mp3")
-	setFileType("000001ba210001000180", "mpg")
-	setFileType("3026b2758e66cf11a6d9", "wmv") //wmv and asf same
+	setFileType("4d546864000000060001", "mid") //MIDI (mid)
 	setFileType("52494646e27807005741", "wav") //Wave (wav)
 	setFileType("52494646246009005741", "wav") //Wave (wav)
 	setFileType("52494646", "wav")             //Wave (wav)
-
-	setFileType("52494646d07d60074156", "avi")
-	setFileType("1a45dfa3a34286810142", "webm")
-
-	setFileType("4d546864000000060001", "mid") //MIDI (mid)
 	setFileType("504b0304140000000800", "zip")
 	setFileType("526172211a0700cf9073", "rar")
 	setFileType("235468697320636f6e66", "ini")
@@ -80,7 +68,7 @@ func init() {
 	setFileType("49545346030000006000", "chm")        //bat file
 	setFileType("04000000010000001300", "mxp")        //bat file
 	setFileType("6431303a637265617465", "torrent")
-	setFileType("6D6F6F76", "mov")         //Quicktime (mov)
+	setFileType("6D6F6F76", "mov")         //Quicktime (mov) - keep for document/image processing
 	setFileType("FF575043", "wpd")         //WordPerfect (wpd)
 	setFileType("CFAD12FEC5FD746F", "dbx") //Outlook Express (dbx)
 	setFileType("2142444E", "pst")         //Outlook (pst)
@@ -136,9 +124,6 @@ func GetFileTypeBySuffix(suffix string) int32 {
 	}
 	if _, ok = audioSuffixes[suffix]; ok {
 		return FILE_TYPE_AUDIO
-	}
-	if _, ok = mediaSuffixes[suffix]; ok {
-		return FILE_TYPE_MEDIA
 	}
 	return FILE_TYPE_FILE
 }

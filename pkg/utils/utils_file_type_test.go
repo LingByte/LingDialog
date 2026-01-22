@@ -85,11 +85,6 @@ func TestGetFileTypeBySuffix(t *testing.T) {
 			expected: FILE_TYPE_AUDIO,
 		},
 		{
-			name:     "Test media file type",
-			suffix:   "mp4",
-			expected: FILE_TYPE_MEDIA,
-		},
-		{
 			name:     "Test other file type",
 			suffix:   "txt",
 			expected: FILE_TYPE_FILE,

@@ -160,7 +160,7 @@ func (h *Handlers) Register(engine *gin.Engine) {
 	LingEcho.RegisterObjects(r, objs)
 
 	// Register AI routes
-	RegisterAIRoutes(r)
+	RegisterAIRoutes(r, h.db)
 
 	// Register Storyline routes
 	RegisterStorylineRoutes(r, h.db)
